@@ -1,41 +1,40 @@
 <?php
 
 require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/config/Connection.php";
 
-if (
-    php_sapi_name() !== 'cli' &&
-    preg_match('/\.(?:png|jpg|jpeg|gif|ico)$/', $_SERVER['REQUEST_URI'])
-  ) {
-      return false;
-  }
+verifType();
 
-use App\Entity\User;
-use Doctrine\ORM\Tools\Setup;
-use Doctrine\ORM\EntityManager;
+use App\Controller\IndexController;
+use App\Router\Router;
+use Symfony\Component\Dotenv\Dotenv;
 
-$paths = [ __DIR__  . "/../src/Entity"];
-$isDevMode = true;
+$dotenv = new Dotenv();
+$dotenv->loadEnv(__DIR__ . '/../.env');
 
-// the connection configuration
-$dbParams = array(
-    'driver'   => 'pdo_mysql',
-    'host'     => 'localhost',
-    'user'     => 'basile',
-    'password' => 'Happy21bb!',
-    'dbname'   => 'php_mvc',
-);
+$connection = new Connection();
+$entityManager = $connection->getEntityManager();
 
-$config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null , null , false);
-$entityManager = EntityManager::create($dbParams, $config); 
+$requestUri = $_SERVER['REQUEST_URI'];
+$requestMethod = $_SERVER['REQUEST_METHOD'];
 
-$user = new User();
-$user->setName("Regnault")
-     ->setUsername("Basile")
-     ->setPassword("BABA")
-     ->setFirstName("Basile2")
-     ->setEmail("basile.regnaily");
+if ($requestUri === '/'){
+    $controller = new IndexController();
+    $controller->index($entityManager);
+}
 
-$entityManager->persist($user);
-$entityManager->flush();
+$router = new Router();
+$router->addRoute('home' , '/contact' , 'GET' ,  IndexController::class , 'contact');
+$router->addRoute('home' , '/' , 'GET' ,  IndexController::class , 'index');
+$router->checkRoute($requestUri , $requestMethod);
 
-echo "Coucou";
+function verifType()
+{
+    if (
+        php_sapi_name() !== 'cli' &&
+        preg_match('/\.(?:png|jpg|jpeg|gif|ico)$/', $_SERVER['REQUEST_URI'])
+    ) {
+        return false;
+    }
+    return true;
+}

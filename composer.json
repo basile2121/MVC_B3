@@ -9,7 +9,9 @@
   ],
   "require": {
     "doctrine/orm": "^2.10",
-    "symfony/cache": "^5.3"
+    "symfony/cache": "^5.3",
+    "vlucas/phpdotenv": "^5.3",
+    "symfony/dotenv": "^5.3"
   },
   "scripts": {
     "start": "php -S localhost:8000 -t public/ public/index.php"
