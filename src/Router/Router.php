@@ -2,6 +2,8 @@
 
 namespace App\Router;
 
+use Doctrine\DBAL\Exception;
+
 class Router{
     private $routes = [];
 
@@ -36,28 +38,27 @@ class Router{
      *
      * @param string $uri
      * @param string $httpMethod
-     * @return bool
+     * @return array
+     * @throws \Exception
      */
-    public function hasRoute(string $uri , string $httpMethod): bool
+    public function getRoute(string $uri , string $httpMethod): array
     {
         foreach ($this->routes as $route){
             if($route['url'] === $uri && $route['http_method'] === $httpMethod){
-                return true;
+                return $route;
             }
         }
-        return false;
+        throw new \Exception("Erreur 404");
     }
 
     /**
      * @param string $uri
      * @param string $httpMethod
+     * @throws \Exception
      */
     public function execute(string $uri , string $httpMethod)
     {
-        if (!$this->hasRoute($uri , $httpMethod)) {
-            // Return 404
-        }
-
+        $route = $this->getRoute($uri , $httpMethod);
         $controller = new $route['controller'];
         $method = $route['method'];
         $controller->$method();

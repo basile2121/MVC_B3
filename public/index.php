@@ -26,7 +26,7 @@ if ($requestUri === '/'){
 $router = new Router();
 $router->addRoute('home' , '/contact' , 'GET' ,  IndexController::class , 'contact');
 $router->addRoute('home' , '/' , 'GET' ,  IndexController::class , 'index');
-$router->checkRoute($requestUri , $requestMethod);
+$router->execute($requestUri , $requestMethod);
 
 function verifType()
 {
